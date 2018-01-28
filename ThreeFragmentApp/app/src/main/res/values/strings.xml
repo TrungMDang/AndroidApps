@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">ThreeFragmentApp</string>
+    <string name="first_frag">First Fragment</string>
+    <string name="second_frag">Second Fragment</string>
+    <string name="third_frag">Second Fragment</string>
+    <string name="button">Next</string>
+</resources>
