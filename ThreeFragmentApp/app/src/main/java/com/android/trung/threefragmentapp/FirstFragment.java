@@ -17,40 +17,51 @@ public class FirstFragment extends Fragment {
     /**
      * Use to listen for item selected and communicate with parent activity.
      */
-    private onItemSelected listener;
+    private OnItemSelectedListener mListener;
 
-    public interface onItemSelected {
+    public interface OnItemSelectedListener {
          boolean onButtonSelected(String text);
     }
 
+
     /**
-     * Guide:
-     * https://github.com/codepath/android_guides/wiki/Creating-and-Using-Fragments#fragment-listener
+     * Check to make sure on fragment attachment to activity, the activity
+     * must implement the interface onItemSelectedListener.
      *
-     * @param context
+     * @param context The context to attach to
      */
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof onItemSelected) {
-            listener = (onItemSelected) context;
-            System.out.println("Listener created.");
-        } else {
+        try {
+            mListener = (OnItemSelectedListener) context;
+        } catch (ClassCastException e) {
             throw new ClassCastException(context.toString() + "Must implement interface " +
-                    "FirstFragment.onItemSelected.");
+                    "FirstFragment.onItemSelectedListener.");
         }
     }
 
-    public void onButtonSelected(View view) {
-        listener.onButtonSelected("button selected");
-        System.out.println("button selected");
-    }
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         //TODO Receive data from 3rd fragment
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        final Button button = getActivity().findViewById(R.id.button);
+        if (button != null && button.getVisibility() == View.VISIBLE) {
+            button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    mListener.onButtonSelected("Button selected from 1st frag");
+                }
+            });
+        }
     }
 
     @Override
@@ -63,6 +74,7 @@ public class FirstFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.first_frag, container, false);
+
     }
 
 }

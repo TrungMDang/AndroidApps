@@ -1,5 +1,6 @@
 package com.android.trung.threefragmentapp;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -14,7 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
 
-public class MainActivity extends FragmentActivity implements FirstFragment.onItemSelected{
+public class MainActivity extends FragmentActivity implements FirstFragment.OnItemSelectedListener {
 
     // Create a new Fragment to be placed in the activity layout
     Fragment firstFragment = null;
@@ -97,12 +98,13 @@ public class MainActivity extends FragmentActivity implements FirstFragment.onIt
 
     }
 
+
     @Override
     public boolean onButtonSelected(String text) {
-        if(firstFragment != null && firstFragment.isInLayout()) {
-            Toast.makeText(this, "button selected", Toast.LENGTH_SHORT).show();
-            System.out.println("Button selected Main activity");
-        }
+        System.out.println("Button selected");
+        Context context = getApplicationContext();
+        Toast toast = Toast.makeText(context, text, Toast.LENGTH_SHORT);
+        toast.show();
         return false;
     }
 }
