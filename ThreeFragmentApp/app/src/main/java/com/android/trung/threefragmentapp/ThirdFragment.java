@@ -21,6 +21,15 @@ public class ThirdFragment extends Fragment {
 
     private String mName;
 
+    private String mData;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (savedInstanceState != null)
+            mData = (String) savedInstanceState.get(MainActivity.DATA);
+
+    }
     /**
      * Check to make sure on fragment attachment to activity, the activity
      * must implement the interface onItemSelectedListener.
@@ -47,28 +56,32 @@ public class ThirdFragment extends Fragment {
     @Override
     public void onActivityCreated(final Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
-
         Bundle b = getArguments();
+
         if (b != null) {
             mName = (String) b.get(MainActivity.NAME);
             System.out.println("mName: " + mName);
-        }
-
-        TextView tv = getActivity().findViewById(R.id.textView4);
-        if (tv != null && tv.getVisibility() == View.VISIBLE) {
-            tv.setText(mName);
-            tv.setGravity(TextView.TEXT_ALIGNMENT_CENTER);
-        }
-
-        final Button button = getActivity().findViewById(R.id.button);
-        if (button != null && button.getVisibility() == View.VISIBLE) {
-            button.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    mListener.onButtonSelected("Button third selected", FRAG_ID, savedInstanceState);
-                }
-            });
+            final String className = this.getClass().getSimpleName();
+            TextView tv = getActivity().findViewById(R.id.textView4);
+            if (tv != null && tv.getVisibility() == View.VISIBLE) {
+                tv.setText(mName);
+                tv.setGravity(TextView.TEXT_ALIGNMENT_CENTER);
+            }
+            final TextView tv1 = getActivity().findViewById(R.id.textViewT_1);
+            if (tv1 != null && tv1.getVisibility() == View.VISIBLE) {
+                tv1.setText((String) b.get(MainActivity.DATA));
+                tv1.setGravity(TextView.TEXT_ALIGNMENT_CENTER);
+            }
+            final Button button = getActivity().findViewById(R.id.button);
+            if (button != null && button.getVisibility() == View.VISIBLE) {
+                button.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        mListener.onButtonSelected(tv1.getText() + className, FRAG_ID,
+                                savedInstanceState);
+                    }
+                });
+            }
         }
     }
 
