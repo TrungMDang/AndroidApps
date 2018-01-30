@@ -1,7 +1,12 @@
 package com.android.trung.threefragmentapp;
 
 import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
+import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,26 +15,24 @@ import android.widget.Button;
 import android.widget.TextView;
 
 /**
+ * The third fragment in 3 fragment sample app. It used 2 listener interfaces to communicate with
+ * parent activity.
+ *
  * Created by trung on 1/27/18.
  */
-
+@Preample(
+        date = "01/30/2018" ,
+        version = "1.0",
+        lastModified = "01/30/2018" ,
+        modifiedBy = "Trung",
+        reviewers = {"Trung"}
+)
 public class ThirdFragment extends Fragment {
 
-    public static final int FRAG_ID = 2;
+    private static final int FRAG_ID = 2;
 
     private OnItemSelectedListener mListener;
 
-    private String mName;
-
-    private String mData;
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (savedInstanceState != null)
-            mData = (String) savedInstanceState.get(MainActivity.DATA);
-
-    }
     /**
      * Check to make sure on fragment attachment to activity, the activity
      * must implement the interface onItemSelectedListener.
@@ -37,7 +40,7 @@ public class ThirdFragment extends Fragment {
      * @param context The context to attach to
      */
     @Override
-    public void onAttach(Context context) {
+    public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         try {
             mListener = (OnItemSelectedListener) context;
@@ -47,19 +50,30 @@ public class ThirdFragment extends Fragment {
         }
     }
 
+
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.third_frag, container, false);
     }
+
+    /**
+     * When the parent activity is created and its onCreate method has finished set up a new
+     * instance of a fragment, this method is called to add UI component to the fragment with data.
+     * It also set up a listener for the button.
+     *
+     * @param savedInstanceState Saved instance state
+     */
+    @VisibleForTesting()
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
     @Override
     public void onActivityCreated(final Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         Bundle b = getArguments();
 
         if (b != null) {
-            mName = (String) b.get(MainActivity.NAME);
+            String mName = (String) b.get(MainActivity.NAME);
             System.out.println("mName: " + mName);
             final String className = this.getClass().getSimpleName();
             TextView tv = getActivity().findViewById(R.id.textView4);
@@ -77,56 +91,11 @@ public class ThirdFragment extends Fragment {
                 button.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        mListener.onButtonSelected(tv1.getText() + className, FRAG_ID,
+                        mListener.onButtonSelected((tv1 != null ? tv1.getText() : null) + className, FRAG_ID,
                                 savedInstanceState);
                     }
                 });
             }
         }
     }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        System.out.println(this.getClass().getName() + " started");
-
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        System.out.println(this.getClass().getName() + " resume");
-
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        System.out.println(System.currentTimeMillis() + " " + this.getClass().getName() + " paused");
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        System.out.println(System.currentTimeMillis() + " " + this.getClass().getName() + " stop");
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        System.out.println(System.currentTimeMillis() + " " + this.getClass().getName() + " view destroyed.");
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        System.out.println(System.currentTimeMillis() + " " + this.getClass().getName() + " destroyed");
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        System.out.println(System.currentTimeMillis() + " " + this.getClass().getName() + " detached");
-    }
-
 }

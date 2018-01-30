@@ -1,6 +1,9 @@
 package com.android.trung.threefragmentapp;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -12,15 +15,40 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.io.InputStream;
 
+
+/**
+ * The main activity of the sample app. When the app is launched, this activity is created with
+ * first fragment. When user clicks "Next" button from any fragment, depending on fragment ID, this
+ * activity will replace current fragment with next one in order 1st - 2nd - 3rd - 1st. Class name
+ * of each fragment is aggregated, passed to new one, and displayed on its TextView.
+ *
+ * Communication between fragments is handled by interface OnItemSelectedListener which sits between
+ * a fragment and parent activity. Any formation from a fragment to another must be passed to parent
+ * activity (this activity) first.
+ *
+ * @author Trung
+ */
+@Preample(
+        date = "01/30/2018" ,
+        version = "1.0",
+        lastModified = "01/30/2018" ,
+        modifiedBy = "Trung",
+        reviewers = {"Trung"}
+)
 public class MainActivity extends FragmentActivity implements OnItemSelectedListener, OnDetachListener {
 
-    public static final short FRAG_ADD = 0;
-    public static final short FRAG_REPLACE = 1;
+    private static final short FRAG_ADD = 0;
+    private static final short FRAG_REPLACE = 1;
     public static final String NAME = "Name";
     public static final String DATA = "Data";
 
 
-
+    /**
+     * Set up necessary work to create the first fragment when the app is launched or resumed.
+     *
+     * @param savedInstanceState Saved instance state
+     */
+    @VisibleForTesting
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,35 +59,20 @@ public class MainActivity extends FragmentActivity implements OnItemSelectedList
         System.out.println(this.getLocalClassName() + " created");
     }
 
+    /**
+     * Implementation of method onButtonSelected from interface OnItemSelectedListener.
+     * Depending on the fragment ID, create the next fragment in order 1st - 2nd - 3rd - 1st.
+     *
+     * @param className Fragment class name passed from parent activity
+     * @param fragID Fragment ID of this activity
+     * @param savedInstanceState Saved instance state
+     */
+    @VisibleForTesting()
     @Override
-    protected void onResume() {
-        super.onResume();
-        System.out.println(this.getLocalClassName() + " resume");
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        System.out.println(this.getLocalClassName() + " started");
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        System.out.println(this.getLocalClassName() + " paused");
-    }
-    @Override
-    protected void onStop() {
-        super.onStop();
-        System.out.println(this.getLocalClassName() + " stopped");
-    }
-
-
-    @Override
-    public boolean onButtonSelected(String className, int fragID, Bundle savedInstanceState) {
+    public void onButtonSelected(String className, int fragID, Bundle savedInstanceState) {
 
         FragmentManager fm = getSupportFragmentManager();
-        String jsonIn = null;
+        String jsonIn;
         className = className + " ";
         switch (fragID) {
             case 0:     //First fragment button was selected
@@ -76,11 +89,21 @@ public class MainActivity extends FragmentActivity implements OnItemSelectedList
                 initializeNewFrag(FRAG_REPLACE, className, jsonIn, fm, savedInstanceState);
                 break;
         }
-        return false;
     }
 
+    /**
+     * Initialize new fragment with information passed from parent activity.
+     *
+     * @param type Type of initialization. ADD or REPLACE only.
+     * @param className Previous fragment class name passed from parent activity
+     * @param jsonIn JSON input
+     * @param fm    Fragment Manager
+     * @param savedInstanceState Saved instance state
+     */
+    @VisibleForTesting()
     private void initializeNewFrag(short type, String className,
-                                   String jsonIn, FragmentManager fm, Bundle savedInstanceState) {
+                                   String jsonIn, @NonNull FragmentManager fm,
+                                   @Nullable Bundle savedInstanceState) {
         // Create a new Fragment to be placed in the activity layout
         Fragment fragment = null;
         try {
@@ -88,9 +111,9 @@ public class MainActivity extends FragmentActivity implements OnItemSelectedList
             String name = reader.getString("name");
             String classpath = reader.getString("classpath");
             FragmentTransaction fragmentTransaction = fm.beginTransaction();
-            /**
-             *  Source: android developer
-             */
+
+            /***********************************************************************************/
+            //  Source: Google Android Developer
             // Check that the activity is using the layout version with
             // the fragment_container FrameLayout
             if (findViewById(R.id.frame_container) != null) {
@@ -101,7 +124,7 @@ public class MainActivity extends FragmentActivity implements OnItemSelectedList
                     return;
                 }
                 //Reflection
-                Class fragmentClass = null;
+                Class fragmentClass;
                 try {
                     fragmentClass = Class.forName(classpath);
                     fragment = (Fragment) fragmentClass.newInstance();
@@ -117,6 +140,7 @@ public class MainActivity extends FragmentActivity implements OnItemSelectedList
                 Bundle b = new Bundle();
                 b.putString(NAME, name);
                 b.putString(DATA, className);
+                assert fragment != null;
                 fragment.setArguments(b);
                 if (type == FRAG_ADD) {
                     // Add the fragment to the 'fragment_container' ConstraintLayout
@@ -131,14 +155,19 @@ public class MainActivity extends FragmentActivity implements OnItemSelectedList
         } catch (JSONException e) {
             e.printStackTrace();
         }
+        /***********************************************************************************/
 
     }
 
     /**
+     * Get the input as string from a JSON file specified by filePath.
      *
-     * @param filePath
-     * @return
+     * @param filePath The relative path of the JSON file.
+     * @return A JSON string
      */
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    @Nullable
+    @VisibleForTesting()
     private String getJSONInput(String filePath) {
         String jsonIn = null;
         try {
@@ -154,13 +183,13 @@ public class MainActivity extends FragmentActivity implements OnItemSelectedList
         return jsonIn;
     }
 
-    @Override
-    public void onBackPressed() {
-        System.out.println(System.currentTimeMillis() + " GO BACK");
-        super.onBackPressed();
-    }
-
-
+    /**
+     * Implementation of interface onDetachListener method. Causes the app to exit when
+     * back button is pressed while first fragment is in view.
+     *
+     *
+     */
+    @VisibleForTesting()
     @Override
     public void onDetach() {
         this.finish();

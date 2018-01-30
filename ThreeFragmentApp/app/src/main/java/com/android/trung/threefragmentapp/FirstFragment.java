@@ -1,7 +1,12 @@
 package com.android.trung.threefragmentapp;
 
 import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
+import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,31 +15,35 @@ import android.widget.Button;
 import android.widget.TextView;
 
 /**
+ * The first fragment in 3 fragment sample app. It used 2 listener interfaces to communicate with
+ * parent activity.
+ *
  * Created by trung on 1/27/18.
- *
- *
  */
+@Preample(
+        date = "01/30/2018" ,
+        version = "1.0",
+        lastModified = "01/30/2018" ,
+        modifiedBy = "Trung",
+        reviewers = {"Trung"}
+)
 public class FirstFragment extends Fragment {
 
-    public static final int FRAG_ID = 0;
-    /**
-     * Use to listen for item selected and communicate with parent activity.
-     */
+    private static final int FRAG_ID = 0;
+
     private OnItemSelectedListener mListener;
 
     private OnDetachListener mDetachListener;
 
-    private String mName;
-
-    private String mData;
     /**
      * Check to make sure on fragment attachment to activity, the activity
      * must implement the interface onItemSelectedListener.
      *
      * @param context The context to attach to
      */
+    @VisibleForTesting()
     @Override
-    public void onAttach(Context context) {
+    public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         try {
             mListener = (OnItemSelectedListener) context;
@@ -44,29 +53,31 @@ public class FirstFragment extends Fragment {
                     "OnItemSelectedListener and OnDetachListener");
         }
     }
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (savedInstanceState != null)
-            mData = (String) savedInstanceState.get(MainActivity.DATA);
-        //TODO Receive data from 3rd fragment
-    }
 
+    @VisibleForTesting()
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.first_frag, container, false);
 
     }
 
+    /**
+     * When the parent activity is created and its onCreate method has finished set up a new
+     * instance of a fragment, this method is called to add UI component to the fragment with data.
+     * It also set up a listener for the button.
+     *
+     * @param savedInstanceState Saved instance state
+     */
+    @VisibleForTesting()
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
     @Override
     public void onActivityCreated(final Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         final Bundle b = getArguments();
         if (b != null) {
-            mName = (String) b.get(MainActivity.NAME);
-            System.out.println("mName: " + mName);
+            String mName = (String) b.get(MainActivity.NAME);
             final String className = this.getClass().getSimpleName();
             TextView tv = getActivity().findViewById(R.id.textView2);
             if (tv != null && tv.getVisibility() == View.VISIBLE) {
@@ -92,44 +103,10 @@ public class FirstFragment extends Fragment {
 
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        System.out.println(this.getClass().getName() + " started");
-
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        System.out.println(this.getClass().getName() + " resume");
-
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        System.out.println(System.currentTimeMillis() + " " + this.getClass().getName() + " paused");
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        System.out.println(System.currentTimeMillis() + " " + this.getClass().getName() + " stop");
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        System.out.println(System.currentTimeMillis() + " " + this.getClass().getName() + " view destroyed.");
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        System.out.println(System.currentTimeMillis() + " " + this.getClass().getName() + " destroyed");
-    }
-
+    /**
+     * This method is called when this fragment needs to communicate with parent activity that
+     * it is detaching.
+     */
     @Override
     public void onDetach() {
         super.onDetach();
