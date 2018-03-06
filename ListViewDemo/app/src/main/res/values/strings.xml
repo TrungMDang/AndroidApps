@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">ListViewDemo</string>
+    <string name="main_button">Submit</string>
+</resources>

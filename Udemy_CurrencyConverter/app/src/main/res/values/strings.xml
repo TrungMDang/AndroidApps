@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Udemy_CurrencyConverter</string>
+    <string name="main_hint_currencyInput">Enter a UK pounds amount</string>
+    <string name="main_button_convert">Convert to US Dollars</string>
+</resources>
