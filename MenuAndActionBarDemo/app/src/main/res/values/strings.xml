@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">MenuToolBarSearchDemo</string>
+    <string name="file">File</string>
+    <string name="edit">Edit</string>
+    <string name="view">View</string>
+    <string name="search">Search</string>
+    <string name="save">Save</string>
+    <string name="open">Open</string>
+    <string name="new_menu">Get New Menu</string>
+    <string name="setting">Setting</string>
+    <string name="toolbar">I am a ToolBar</string>
+    <string name="hint">Search app content</string>
+</resources>

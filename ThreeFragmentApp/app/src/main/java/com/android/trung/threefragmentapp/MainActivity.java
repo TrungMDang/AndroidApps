@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -39,10 +40,18 @@ public class MainActivity extends FragmentActivity implements OnItemSelectedList
 
     private static final short FRAG_ADD = 0;
     private static final short FRAG_REPLACE = 1;
-    public static final String NAME = "Name";
-    public static final String DATA = "Data";
+    public static final String KEY_NAME = "Name";
+    public static final String KEY_DATA = "Data";
+    private final String mTag = this.getClass().getSimpleName();
+    private int mFrag_ID;
+    private Fragment mFrag;
 
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putString(KEY_DATA, String.valueOf(mFrag_ID));
+        super.onSaveInstanceState(outState);
+    }
     /**
      * Set up necessary work to create the first fragment when the app is launched or resumed.
      *
@@ -51,13 +60,25 @@ public class MainActivity extends FragmentActivity implements OnItemSelectedList
     @VisibleForTesting
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d(mTag, "--------------  onCreate()  ---------------");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        String jsonIn = getJSONInput("data/first_frag.json");
-        FragmentManager fm = getSupportFragmentManager();
-        initializeNewFrag(FRAG_ADD, null, jsonIn, fm, savedInstanceState);
-        System.out.println(this.getLocalClassName() + " created");
+        String jsonIn;
+        if (savedInstanceState == null) {
+            Log.d(mTag, "savedInstanceState is null");
+            jsonIn = getJSONInput("data/first_frag.json");
+            FragmentManager fm = getSupportFragmentManager();
+            mFrag = initializeNewFrag(FRAG_ADD, null, jsonIn, fm, savedInstanceState);
+            System.out.println(this.getLocalClassName() + " created");
+        }
+
     }
+
+//    @Override
+//    public void onSaveInstanceState(Bundle outState) {
+//        outState.putInt("frag_id", mFrag_ID);
+//        super.onSaveInstanceState(outState);
+//    }
 
     /**
      * Implementation of method onButtonSelected from interface OnItemSelectedListener.
@@ -76,17 +97,22 @@ public class MainActivity extends FragmentActivity implements OnItemSelectedList
         className = className + " ";
         switch (fragID) {
             case 0:     //First fragment button was selected
+                Log.d(this.getClass().getSimpleName(), "First fragment's button was clicked");
                 jsonIn = getJSONInput("data/second_frag.json");
                 initializeNewFrag(FRAG_REPLACE, className, jsonIn, fm, savedInstanceState);
-
+                mFrag_ID = 1;
                 break;
             case 1:     //Second fragment button was selected
+                Log.d(this.getClass().getSimpleName(), "Second fragment's button was clicked");
                 jsonIn = getJSONInput("data/third_frag.json");
                 initializeNewFrag(FRAG_REPLACE, className, jsonIn, fm, savedInstanceState);
+                mFrag_ID = 2;
                 break;
             case 2:
+                Log.d(this.getClass().getSimpleName(), "Third fragment's button was clicked");
                 jsonIn = getJSONInput("data/first_frag.json");
                 initializeNewFrag(FRAG_REPLACE, className, jsonIn, fm, savedInstanceState);
+                mFrag_ID = 0;
                 break;
         }
     }
@@ -101,9 +127,10 @@ public class MainActivity extends FragmentActivity implements OnItemSelectedList
      * @param savedInstanceState Saved instance state
      */
     @VisibleForTesting()
-    private void initializeNewFrag(short type, String className,
+    private Fragment initializeNewFrag(short type, String className,
                                    String jsonIn, @NonNull FragmentManager fm,
                                    @Nullable Bundle savedInstanceState) {
+        Log.d(mTag, "Initialize new fragment with type: " + type + " - data: " + className);
         // Create a new Fragment to be placed in the activity layout
         Fragment fragment = null;
         try {
@@ -120,43 +147,65 @@ public class MainActivity extends FragmentActivity implements OnItemSelectedList
                 // However, if we're being restored from a previous state,
                 // then we don't need to do anything and should return or else
                 // we could end up with overlapping fragments.
+//                if (savedInstanceState != null) {
+//                    return;
+//                }
+
                 if (savedInstanceState != null) {
-                    return;
-                }
-                //Reflection
-                Class fragmentClass;
-                try {
-                    fragmentClass = Class.forName(classpath);
-                    fragment = (Fragment) fragmentClass.newInstance();
+//                    Log.d(mTag, "savedInstanceState is not null");
+//                    fragmentTransaction.add(R.id.frame_container,
+//                            fm.findFragmentByTag(String.valueOf(mFrag_ID)), String.valueOf(mFrag_ID));
+//                    fragmentTransaction.commit();
+                    return null;
+                } else {
+                    Log.d(mTag, "savedInstanceState is null");
+                    //Reflection
+                    Class fragmentClass;
+                    try {
+                        fragmentClass = Class.forName(classpath);
+                        fragment = (Fragment) fragmentClass.newInstance();
 
 
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
-                } catch (InstantiationException e) {
-                    e.printStackTrace();
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    } catch (ClassNotFoundException e) {
+                        e.printStackTrace();
+                    } catch (InstantiationException e) {
+                        e.printStackTrace();
+                    }
+
+                    Bundle b = new Bundle();
+                    if (savedInstanceState != null) {
+                        b.putString(KEY_NAME, name);
+                        b.putString(KEY_DATA, (String) savedInstanceState.get("name"));
+                    } else {
+
+                        b.putString(KEY_NAME, name);
+                        b.putString(KEY_DATA, className);
+
+                    }
+
+                    assert fragment != null;
+                    fragment.setArguments(b);
+
+                    mFrag_ID = fragment.getId();
+                    if (type == FRAG_ADD) {
+                        // Add the fragment to the 'fragment_container' ConstraintLayout
+                        fragmentTransaction.add(R.id.frame_container, fragment, String.valueOf(mFrag_ID));
+                    } else if (type == FRAG_REPLACE) {
+                        fragmentTransaction.replace(R.id.frame_container, fragment, String.valueOf(mFrag_ID));
+                    }
+                    fragmentTransaction.addToBackStack(name);
+                    fragmentTransaction.commit();
+                    return fragment;
                 }
-                Bundle b = new Bundle();
-                b.putString(NAME, name);
-                b.putString(DATA, className);
-                assert fragment != null;
-                fragment.setArguments(b);
-                if (type == FRAG_ADD) {
-                    // Add the fragment to the 'fragment_container' ConstraintLayout
-                    fragmentTransaction.add(R.id.frame_container, fragment);
-                } else if (type == FRAG_REPLACE) {
-                    fragmentTransaction.replace(R.id.frame_container, fragment);
-                }
-                fragmentTransaction.addToBackStack(name);
-                fragmentTransaction.commit();
 
             }
         } catch (JSONException e) {
             e.printStackTrace();
         }
         /***********************************************************************************/
-
+        return fragment;
     }
 
     /**
@@ -194,4 +243,8 @@ public class MainActivity extends FragmentActivity implements OnItemSelectedList
     public void onDetach() {
         this.finish();
     }
+
+
+
+
 }

@@ -1,0 +1,33 @@
+package com.trungdang.practice.mindorks_dagger2example.di.modules;
+
+import android.app.Activity;
+import android.content.Context;
+
+import com.trungdang.practice.mindorks_dagger2example.di.ActivityContext;
+
+import dagger.Module;
+import dagger.Provides;
+
+/**
+ * Created by Trung Dang on 3/19/2018.
+ */
+@Module
+public class ActivityModule {
+
+    private Activity mActivity;
+
+    public ActivityModule(Activity activity) {
+        mActivity = activity;
+    }
+
+    @Provides
+    @ActivityContext
+    Context provideContext() {
+        return mActivity;
+    }
+
+    @Provides
+    Activity provideActivity() {
+        return mActivity;
+    }
+}
