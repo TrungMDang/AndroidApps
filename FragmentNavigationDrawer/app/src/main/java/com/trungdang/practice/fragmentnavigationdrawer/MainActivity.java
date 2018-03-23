@@ -1,6 +1,5 @@
 package com.trungdang.practice.fragmentnavigationdrawer;
 
-import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Build;
@@ -25,7 +24,6 @@ import com.trungdang.practice.fragmentnavigationdrawer.dummy.DummyContent;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.Set;
 import java.util.Stack;
 
 public class MainActivity extends AppCompatActivity implements FragmentInteractionAdapter,
@@ -46,6 +44,8 @@ public class MainActivity extends AppCompatActivity implements FragmentInteracti
     private ActionBarDrawerToggle drawerToggle;
 
     private Fragment mFrag;
+
+    private int backStackSize = 0;
 
 
     @Override
@@ -85,10 +85,53 @@ public class MainActivity extends AppCompatActivity implements FragmentInteracti
                         .addToBackStack(mFrag.getArguments().getString(KEY_NAME))
                         .commit();
                 mPrevFragName.push(mFrag.getArguments().getString(KEY_NAME));
+                backStackSize++;
 
 
             }
         }
+
+        final FragmentManager fm = getSupportFragmentManager();
+        fm.addOnBackStackChangedListener(
+                new FragmentManager.OnBackStackChangedListener() {
+                    public void onBackStackChanged() {
+
+                        // Update your UI here.
+                        Log.d(TAG, "Previous back stack size: " + backStackSize);
+                        Log.d(TAG, "New back stack size: " + fm.getBackStackEntryCount());
+                        //Back button. Back stack entry removed
+                        if (fm.getBackStackEntryCount() > 0 && fm.getBackStackEntryCount() < backStackSize) {
+                            FragmentManager.BackStackEntry bSE =
+                                    fm.getBackStackEntryAt(fm.getBackStackEntryCount() - 1);
+                            Log.d(TAG, "bSE: " + bSE.toString());
+                            mToolbar.setTitle(bSE.getName());
+                            Menu menu = mNavView.getMenu();
+                            int count = 0;
+                            Log.d(TAG, "bSE name: " + bSE.getName());
+                            while (count < menu.size() && !menu.getItem(count).getTitle().toString().toLowerCase().equalsIgnoreCase(bSE.getName())) {
+                                Log.d(TAG, "menuItem title: " + menu.getItem(count).getTitle());
+                                count++;
+                            }
+                            menu.getItem(count).setChecked(true);
+
+//                            int id = bSE.getId();
+//                            fm.getFragments();
+//                            Log.d(TAG, "bSE ID: " + id + " " + "MenuItem ID to find: " + id % (menu.size() + 1));
+//                            Log.d(TAG, "Menu size: " + (menu.size() + 1));
+//                            MenuItem menuItem = menu.getItem(id % (menu.size() + 1));
+//                            Log.d(TAG, "menuItem: " + menuItem);
+//                            if (menuItem != null) menuItem.setChecked(true);
+                            // Back stack entry added
+                        } else if (fm.getBackStackEntryCount() > 0 && fm.getBackStackEntryCount() > backStackSize) {
+                            return;
+                        } else {
+                            mToolbar.setTitle(null);
+                        }
+                        backStackSize = fm.getBackStackEntryCount();
+                    }
+
+                });
+
 
 
     }
@@ -113,6 +156,12 @@ public class MainActivity extends AppCompatActivity implements FragmentInteracti
             window.setStatusBarColor(getResources().getColor(R.color.colorPrimaryDark));
         }
 
+        FragmentManager fm = getSupportFragmentManager();
+
+//        //Clear back stack on activity starts
+//        while (fm.getBackStackEntryCount() > 0){
+//            fm.popBackStack();
+//        }
         super.onStart();
 
     }
@@ -160,27 +209,6 @@ public class MainActivity extends AppCompatActivity implements FragmentInteracti
     public void onResume() {
         Log.d(TAG, "Resuming...");
         super.onResume();
-        final FragmentManager fm = getSupportFragmentManager();
-        fm.addOnBackStackChangedListener(
-                new FragmentManager.OnBackStackChangedListener() {
-                    public void onBackStackChanged() {
-                        // Update your UI here.
-                        Log.d(TAG, "-------------------  Back stack: " + fm.getFragments().toString());
-                        if (fm.getBackStackEntryCount() > 0) {
-                            FragmentManager.BackStackEntry bSE =
-                                    fm.getBackStackEntryAt(fm.getBackStackEntryCount() - 1);
-                            Log.d(TAG, bSE.toString());
-                            mToolbar.setTitle(bSE.getName());
-
-                            Menu menu = mNavView.getMenu();
-                            int id = bSE.getId();
-                            MenuItem mItem = menu.getItem(id % (menu.size() - 1));
-                            if (mItem != null) mItem.setChecked(true);
-                        } else {
-                            mToolbar.setTitle(null);
-                        }
-                    }
-                });
 
     }
 
@@ -255,14 +283,16 @@ public class MainActivity extends AppCompatActivity implements FragmentInteracti
                         .addToBackStack(frag.getArguments().getString(KEY_NAME))
                         .replace(R.id.flContent, frag, frag.getArguments().getString(KEY_NAME))
                         .commit();
-                Log.d(TAG, "Fragment name: " + frag.getArguments().getString(KEY_NAME));
-                mToolbar.setTitle(frag.getArguments().getString(KEY_NAME));
-                FragmentManager fm = getSupportFragmentManager();
-                FragmentManager.BackStackEntry bSE = fm.getBackStackEntryAt(fm.getBackStackEntryCount() - 1);
-                Menu menu = mNavView.getMenu();
-                int id = bSE.getId();
-                MenuItem mItem = menu.getItem(id % (menu.size() - 1));
-                if (mItem != null) mItem.setChecked(true);
+                backStackSize++;
+
+//                Log.d(TAG, "Fragment name: " + frag.getArguments().getString(KEY_NAME));
+//                mToolbar.setTitle(frag.getArguments().getString(KEY_NAME));
+//                FragmentManager fm = getSupportFragmentManager();
+//                FragmentManager.BackStackEntry bSE = fm.getBackStackEntryAt(fm.getBackStackEntryCount() - 1);
+//                Menu menu = mNavView.getMenu();
+//                int id = bSE.getId();
+//                MenuItem mItem = menu.getItem(id % (menu.size() - 1));
+//                if (mItem != null) mItem.setChecked(true);
                 break;
             case R.id.action_settings:
                 Toast.makeText(this, "SETTINGS", Toast.LENGTH_SHORT).show();
@@ -279,7 +309,7 @@ public class MainActivity extends AppCompatActivity implements FragmentInteracti
                 new NavigationView.OnNavigationItemSelectedListener() {
                     @Override
                     public boolean onNavigationItemSelected(MenuItem menuItem) {
-                        onItemSelectedListener(menuItem);
+                        onDrawerItemSelected(menuItem);
                         return true;
                     }
                 });
@@ -288,8 +318,8 @@ public class MainActivity extends AppCompatActivity implements FragmentInteracti
     /**
      * Drawer menu items interaction
      */
-    private void onItemSelectedListener(MenuItem menuItem) {
-        menuItem.setChecked(true);
+    private void onDrawerItemSelected(MenuItem menuItem) {
+        //menuItem.setChecked(true);
         Fragment frag;
         String input;
         String fragName;
@@ -325,7 +355,7 @@ public class MainActivity extends AppCompatActivity implements FragmentInteracti
                 .replace(R.id.flContent, frag, fragName)
                 .addToBackStack(fragName)
                 .commit();
-
+        backStackSize++;
 
         Log.d(TAG, "Previous fragment name saved: " + mPrevFragName.peek());
         mFrag = frag;
@@ -375,6 +405,7 @@ public class MainActivity extends AppCompatActivity implements FragmentInteracti
                 .replace(R.id.flContent, frag, fragName)
                 .addToBackStack(frag.getArguments().getString(KEY_NAME))
                 .commit();
+        backStackSize++;
 
         mFrag = frag;
 
