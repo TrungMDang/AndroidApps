@@ -66,6 +66,7 @@ public class NavWeatherFragment extends Fragment implements View.OnClickListener
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
         mData = new Bundle();
+
     }
 
     @Override
@@ -157,4 +158,5 @@ public class NavWeatherFragment extends Fragment implements View.OnClickListener
         mData.putString(KEY_DATA, tv2.getText() + " " + (tv1.getText() == null ? EMPTY_STRING : tv1.getText().toString()));
         mAdapter.onItemSelectedListener(v.getId(), mData.getString(KEY_DATA));
     }
+
 }

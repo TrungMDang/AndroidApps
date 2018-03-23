@@ -6,7 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.trungdang.practice.fragmentnavigationdrawer.MainActivity"
-    android:theme="@style/BaseAppTheme">
+    android:theme="@style/BaseAppTheme"
+    android:animateLayoutChanges="true">
 
     <!-- This LinearLayout represents the contents of the screen  -->
     <LinearLayout

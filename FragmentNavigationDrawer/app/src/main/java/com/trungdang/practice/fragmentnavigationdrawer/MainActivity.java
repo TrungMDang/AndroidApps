@@ -108,20 +108,13 @@ public class MainActivity extends AppCompatActivity implements FragmentInteracti
                             Menu menu = mNavView.getMenu();
                             int count = 0;
                             Log.d(TAG, "bSE name: " + bSE.getName());
+
+                            //Compare name of back stack entry and title of menu item.
                             while (count < menu.size() && !menu.getItem(count).getTitle().toString().toLowerCase().equalsIgnoreCase(bSE.getName())) {
                                 Log.d(TAG, "menuItem title: " + menu.getItem(count).getTitle());
                                 count++;
                             }
                             menu.getItem(count).setChecked(true);
-
-//                            int id = bSE.getId();
-//                            fm.getFragments();
-//                            Log.d(TAG, "bSE ID: " + id + " " + "MenuItem ID to find: " + id % (menu.size() + 1));
-//                            Log.d(TAG, "Menu size: " + (menu.size() + 1));
-//                            MenuItem menuItem = menu.getItem(id % (menu.size() + 1));
-//                            Log.d(TAG, "menuItem: " + menuItem);
-//                            if (menuItem != null) menuItem.setChecked(true);
-                            // Back stack entry added
                         } else if (fm.getBackStackEntryCount() > 0 && fm.getBackStackEntryCount() > backStackSize) {
                             return;
                         } else {
@@ -131,8 +124,6 @@ public class MainActivity extends AppCompatActivity implements FragmentInteracti
                     }
 
                 });
-
-
 
     }
 
@@ -163,6 +154,7 @@ public class MainActivity extends AppCompatActivity implements FragmentInteracti
 //            fm.popBackStack();
 //        }
         super.onStart();
+
 
     }
 
@@ -351,7 +343,10 @@ public class MainActivity extends AppCompatActivity implements FragmentInteracti
         mPrevFragName.push(fragName);
 
         FragmentManager fm = getSupportFragmentManager();
+
         fm.beginTransaction()
+                .setCustomAnimations(R.animator.enter_from_right, R.animator.exit_to_left,
+                        R.animator.enter_from_left, R.animator.exit_to_right)
                 .replace(R.id.flContent, frag, fragName)
                 .addToBackStack(fragName)
                 .commit();
@@ -455,5 +450,10 @@ public class MainActivity extends AppCompatActivity implements FragmentInteracti
     public void onListFragmentInteraction(DummyContent.DummyItem item) {
         Log.d(TAG, "Item: " + item.toString());
         Toast.makeText(this, "Item #" + item.id, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
     }
 }
