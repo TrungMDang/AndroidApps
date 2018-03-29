@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <SwitchPreference
+        android:key="pref_theme_color_toggle"
+        android:title="@string/pref_theme_color_toggle"
+        android:summary="@string/pref_theme_color_toggle_sum"
+        android:defaultValue="false"></SwitchPreference>
+
+    <Preference
+        android:key="pref_time_selector"
+        android:title="@string/pref_time_selector"
+        android:summary="@string/pref_time_selector_sum"></Preference>
+</PreferenceScreen>
