@@ -1,0 +1,25 @@
+<resources>
+    <string name="app_name">BeerAdviser</string>
+    <string name="button">Get Beer</string>
+    <string name="brands" />
+    <string-array name="beer_colors">
+        <item>light</item>
+        <item>amber</item>
+        <item>brown</item>
+        <item>dark</item>
+    </string-array>
+    <string name="skyrim_beer">Skyrim\'s Dragonbeer</string>
+    <string name="lotr_beer_gondor">Gondor\'s Whiterock Beer</string>
+    <string name="lotr_beer_mordor">Mordor\'s Dark Volcano Beer</string>
+    <string name="lotr_beer_rohan">Rohan Manelord Beer</string>
+    <string name="shire_beer">The Shire\'s Festival Beer</string>
+    <string name="send_message">Send Message</string>
+    <string name="receive_message_activity">Receive Message</string>
+
+
+    <!--<item>Skyrim's Dragonbeer</item>-->
+    <!--<item>Gondor's Whiterock Beer</item>-->
+    <!--<item>Mordor's Dark Volcano Beer</item>-->
+    <!--<item>The Shire's Festival Beer</item>-->
+    <!--<item>Rohan Manelord Beer</item>-->
+</resources>
