@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">StarBuzz</string>
+    <string name="starbuzz_logo">Starbuzz Logo</string>
+    <string name="title_activity_drink_category">Drink Category</string>
+    <string name="drink_image">An Image for A Drink</string>
+    <string name="title_activity_drink">Drink</string>
+</resources>
